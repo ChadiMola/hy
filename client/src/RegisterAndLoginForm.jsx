@@ -1,4 +1,4 @@
-import {useContext, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import axios from "axios";
 import {UserContext} from "./UserContext.jsx";
 
@@ -14,6 +14,7 @@ export default function RegisterAndLoginForm() {
     setLoggedInUsername(username);
     setId(data.id);
   }
+  
   return (
     <div className="bg-blue-50 h-screen flex items-center">
       <form className="w-64 mx-auto mb-12" onSubmit={handleSubmit}>

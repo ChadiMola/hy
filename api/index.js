@@ -25,9 +25,11 @@ connectdb()
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: 'http://localhost:5173',
-  credentials: true,
-  allowedHeaders: 'Authorization'
+ 
+    origin: 'http://localhost:5173',
+    credentials: true,
+    optionSuccessStatus: 200,
+  
 }));
 app.use('/uploads', express.static(__dirname + '/uploads'));
 const jwtSecret = process.env.JWT_SECRET;
@@ -49,6 +51,20 @@ async function getUserDataFromRequest(req) {
 
 app.get('/test', (req,res) => {
   res.json('test ok');
+});
+app.post('/login', async (req,res) => {
+  const {username, password} = req.body;
+  const foundUser = await User.findOne({username});
+  if (foundUser) {
+    const passOk = bcrypt.compareSync(password, foundUser.password);
+    if (passOk) {
+      jwt.sign({userId:foundUser._id,username}, jwtSecret, {}, (err, token) => {
+        res.cookie('token', token, {sameSite:'none', secure:true}).send({
+          id: foundUser._id,
+        });
+      });
+    }
+  }
 });
 
 app.get('/messages/:userId', async (req,res) => {
